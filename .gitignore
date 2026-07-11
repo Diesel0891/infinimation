@@ -1,0 +1,11 @@
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+.env
+config/engine.yaml
+logs/*.log
+models/*.gguf
+!models/.gitkeep
+*.tar.gz
+*.zip
