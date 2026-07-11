@@ -162,3 +162,52 @@ CRITICAL NOTES FOR A NEW SESSION
 - The Telegram bot is live and polling. Do not regenerate the bot token unless necessary.
 
 END OF HANDOFF SUMMARY V2
+
+ADDENDUM FOR RENEWED SESSIONS — READ BEFORE PROCEEDING
+If you are Kimi reading this after chat truncation, do NOT assume state. Execute these verifications in order before giving the user any new commands.
+
+VERIFICATION CHECKLIST (Run in Termux before any new steps)
+1. cd ~/infinimation && ls -la
+   Expected: engine.py, bot.py, requirements.txt, .gitignore, config/, skills/, logs/, models/, bin/, docs/
+2. git status
+   Expected: working tree clean (or only untracked files like logs)
+3. python3 --version
+   Expected: Python 3.14.6
+4. pip show python-telegram-bot | grep Version
+   Expected: 21.11.1
+5. cat config/engine.yaml | grep -E "enabled|token"
+   Expected: telegram.enabled: true, token: 8667395552:AAGvdh7IiFlb2tkWcC7NdOKoOLIZSZH3NjA
+   If token is missing or wrong, the bot will not start. Do not regenerate unless the user explicitly asks.
+6. ls skills/
+   Expected: web_scrape.py, app_launch.py, system_status.py, show_help.py, send_message.py, take_screenshot.py
+7. python3 -c "import engine; print(engine.execute_command('status'))"
+   Expected: success=True, output contains battery/storage/RAM info
+8. /system/bin/screencap -p /dev/null 2>&1 && echo "screencap OK" || echo "screencap BROKEN"
+   Expected: screencap OK. If BROKEN, do not rely on take_screenshot skill.
+9. Check if bot is already running: ps aux | grep bot.py
+   If running, warn the user that restarting may cause duplicate polling or Telegram conflict.
+
+IF ANY VERIFICATION FAILS:
+- Do not proceed to the next step.
+- Tell the user exactly which check failed and what the output was.
+- Ask the user to fix it or confirm they want to rebuild that component.
+
+CURRENT STATE SNAPSHOT (for reference)
+- Telegram bot: LIVE and polling. Token valid. Username: @infinimation_bot (or infinimation_automation_bot if that was taken).
+- Verified Telegram commands: /start, /help, status, open whatsapp, open chrome, scrape <url>, help, send message to <contact>, screenshot.
+- engine.py: Intent classifier with 6 regex patterns. Dynamic skill loader. execute_command() is the single entry point.
+- bot.py: python-telegram-bot v21.11.1. Includes Python 3.14 event loop fix. Imports engine and calls execute_command().
+- take_screenshot.py: Uses /system/bin/screencap -p (verified native binary). Saves to ~/storage/shared/Pictures/Screenshots.
+- send_message.py: Phase 1 (intent pre-fill). Uses am start for SMS and WhatsApp. May need Shizuku relay for full automation.
+- config/engine.yaml: telegram.enabled=true, llm.enabled=false, shizuku_host=192.168.1.100:8022 (placeholder).
+- GitHub: https://github.com/Diesel0891/infinimation. PAT was exposed and revoked. Future pushes may need new auth.
+
+NEXT STEP AFTER VERIFICATION:
+The immediate next step is Step 6: Local LLM Integration.
+- Download llama.cpp aarch64 binary for Termux
+- Download Qwen 2.5 1.5B Q4_K_M GGUF to models/
+- Create llm_interface.py with on-demand load/inference/unload
+- Wire engine.py LLM fallback to call llm_interface.py
+- Set llm.enabled=true in config
+
+DO NOT SKIP VERIFICATION. Context loss is real. This document is your only source of truth.
