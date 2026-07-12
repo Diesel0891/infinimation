@@ -16,7 +16,7 @@ SCREENSHOT_DIR = "/sdcard/Pictures/Screenshots"
 
 def _sh(cmd: str) -> tuple:
     """Execute via rish. Returns (stdout, stderr, returncode)."""
-    result = subprocess.run([RISH, "-c", cmd], capture_output=True, text=True)
+    env = os.environ.copy(); env["RISH_APPLICATION_ID"] = "com.termux"; result = subprocess.run([RISH, "-c", cmd], capture_output=True, text=True, env=env)
     return result.stdout.strip(), result.stderr.strip(), result.returncode
 
 
