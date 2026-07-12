@@ -1,8 +1,9 @@
 """
 Skill: app_launch
-Launches Android apps via package intent.
+Launches Android apps via package intent through Shizuku.
 """
 import subprocess
+import os
 import logging
 
 logger = logging.getLogger("infinimation")
@@ -14,6 +15,12 @@ APP_PACKAGES = {
     "camera": "com.android.camera/.Camera",
     "telegram": "org.telegram.messenger/org.telegram.ui.LaunchActivity",
 }
+
+def _sh(cmd: str) -> tuple:
+    env = os.environ.copy()
+    env["RISH_APPLICATION_ID"] = "com.termux"
+    result = subprocess.run(["rish", "-c", cmd], capture_output=True, text=True, env=env)
+    return result.stdout.strip(), result.stderr.strip(), result.returncode
 
 def run(args, *extra_args, raw_text: str = "") -> str:
     # Handle both dict (new engine) and string (old engine)
@@ -30,17 +37,11 @@ def run(args, *extra_args, raw_text: str = "") -> str:
         return f"Unknown app '{app_name}'. Known: {', '.join(APP_PACKAGES.keys())}"
 
     cmd = f"am start -n {package}"
-    try:
-        result = subprocess.run(
-            ["sh", "-c", cmd],
-            capture_output=True, text=True, timeout=10
-        )
-        if result.returncode == 0:
-            logger.info(f"APP_LAUNCHED: {app_name}")
-            return f"Launched {app_name}."
-        else:
-            logger.info(f"APP_LAUNCH_FAILED: {app_name}")
-            return f"Direct launch failed for {app_name}. Shizuku relay will handle this."
-    except Exception as e:
-        logger.error(f"APP_LAUNCH_ERROR: {e}")
-        return f"Error launching {app_name}: {str(e)}"
+    out, err, rc = _sh(cmd)
+    
+    if rc == 0:
+        logger.info(f"APP_LAUNCHED: {app_name}")
+        return f"Launched {app_name}."
+    else:
+        logger.error(f"APP_LAUNCH_FAILED: {app_name} | err={err}")
+        return f"Failed to launch {app_name}: {err}"
