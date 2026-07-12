@@ -93,8 +93,33 @@ def execute_command(text: str) -> dict:
         else:
             result["output"] = f"Skill '{skill_name}' exists but has no run() function."
     else:
-        result["output"] = "No regex match. LLM fallback not yet loaded."
-        result["skill_used"] = "llm_fallback_pending"
+        try:
+            import llm_interface
+            parsed = llm_interface.parse_intent(text)
+            llm_skill = parsed.get("skill", "unknown")
+            confidence = parsed.get("confidence", 0.0)
+            
+            if llm_skill != "unknown" and confidence >= 0.5:
+                skill = load_skill(llm_skill)
+                if skill and hasattr(skill, "run"):
+                    try:
+                        output = skill.run(raw_text=text)
+                        result.update({"success": True, "output": output, "skill_used": llm_skill})
+                    except TypeError:
+                        result["output"] = f"Detected intent: {llm_skill}, but need more details. Try a more specific command."
+                        result["skill_used"] = "llm_partial"
+                    except Exception as e:
+                        result["output"] = f"Skill error: {str(e)}"
+                        logger.exception(f"SKILL_ERROR: {llm_skill}")
+                else:
+                    result["output"] = f"Skill '{llm_skill}' not available."
+                    result["skill_used"] = "llm_fallback"
+            else:
+                result["output"] = "I did not understand that command. Try: scrape <url>, open <app>, send message to <contact>, screenshot, status, or help."
+                result["skill_used"] = "unknown"
+        except Exception as e:
+            result["output"] = f"LLM fallback unavailable: {str(e)}"
+            result["skill_used"] = "llm_error"
     
     return result
 

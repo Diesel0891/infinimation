@@ -1,0 +1,47 @@
+engine:
+  name: infinimation
+  primary_device: galaxy_a03
+  version: 0.2.0
+llm:
+  enabled: true
+  provider: router
+  priority:
+    - gemini
+    - groq
+    - openrouter
+    - ollama
+  gemini:
+    api_key: 'YOUR_GEMINI_API_KEY'
+    model: gemini-2.5-flash
+    timeout: 15
+    retries: 3
+    enabled: true
+  groq:
+    api_key: 'YOUR_GROQ_API_KEY'
+    model: llama-3.1-8b-instant
+    timeout: 10
+    retries: 2
+    enabled: true
+  openrouter:
+    api_key: 'YOUR_OPENROUTER_API_KEY'
+    model: qwen/qwen-2.5-7b-instruct
+    timeout: 15
+    enabled: true
+  ollama:
+    host: 'http://localhost:11434'
+    model: qwen2.5:1.5b
+    timeout: 30
+    enabled: false
+skills:
+  auto_load: true
+  enabled:
+    - web_scrape
+    - app_launch
+    - system_status
+    - send_message
+    - take_screenshot
+    - show_help
+telegram:
+  enabled: true
+  token: 'YOUR_TELEGRAM_BOT_TOKEN'
+  allowed_usernames: []
