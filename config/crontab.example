@@ -1,0 +1,17 @@
+# Infinimation Cron Jobs
+# Copy this to your crontab with: crontab config/crontab.example
+# Then edit as needed.
+
+LOG_FILE=/data/data/com.termux/files/home/infinimation/logs/cron.log
+
+# Example: Run system status check every hour
+# 0 * * * * cd /data/data/com.termux/files/home/infinimation && python3 bin/cron_runner.py system_status >> $LOG_FILE 2>&1
+
+# Example: Take a screenshot every 30 minutes
+# */30 * * * * cd /data/data/com.termux/files/home/infinimation && python3 bin/cron_runner.py take_screenshot >> $LOG_FILE 2>&1
+
+# Example: Scrape price page every 5 minutes during business hours
+# */5 9-17 * * 1-5 cd /data/data/com.termux/files/home/infinimation && python3 bin/cron_runner.py web_scrape '{"url": "https://example.com/prices"}' >> $LOG_FILE 2>&1
+
+# Example: Daily health check at 8 AM
+# 0 8 * * * cd /data/data/com.termux/files/home/infinimation && python3 bin/cron_runner.py system_status >> $LOG_FILE 2>&1
