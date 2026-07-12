@@ -9,3 +9,9 @@ models/*.gguf
 !models/.gitkeep
 *.tar.gz
 *.zip
+
+# Python cache artifacts
+__pycache__/
+*.py[cod]
+*$py.class
+pycache/
