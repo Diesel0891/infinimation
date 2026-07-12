@@ -15,11 +15,20 @@ APP_PACKAGES = {
     "telegram": "org.telegram.messenger/org.telegram.ui.LaunchActivity",
 }
 
-def run(app_name: str, *args, raw_text: str = "") -> str:
+def run(args, *extra_args, raw_text: str = "") -> str:
+    # Handle both dict (new engine) and string (old engine)
+    if isinstance(args, dict):
+        app_name = args.get("app", "")
+    else:
+        app_name = str(args)
+
+    if not app_name:
+        return "No app name provided."
+
     package = APP_PACKAGES.get(app_name.lower())
     if not package:
         return f"Unknown app '{app_name}'. Known: {', '.join(APP_PACKAGES.keys())}"
-    
+
     cmd = f"am start -n {package}"
     try:
         result = subprocess.run(

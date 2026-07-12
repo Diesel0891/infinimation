@@ -144,7 +144,7 @@ def run(args: dict) -> dict:
         return {"success": False, "message": "No URL provided. Usage: fill form at <url> with field1=value1 field2=value2"}
 
     # Extract fields from args (skip meta keys)
-    skip = {"url", "link", "website", "action", "submit", "submit_text", "skill", "confidence"}
+    skip = {"url", "link", "website", "action", "submit", "submit_text", "skill", "confidence", "raw_text", "param_0"}
     fields = {k: v for k, v in args.items() if k not in skip}
 
     submit_text = args.get("submit") or args.get("submit_text")
