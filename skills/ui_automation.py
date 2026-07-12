@@ -11,7 +11,7 @@ from datetime import datetime
 
 RISH = "rish"
 DUMP_PATH = "/sdcard/window_dump.xml"
-SCREENSHOT_DIR = "/storage/shared/Pictures/Screenshots"
+SCREENSHOT_DIR = "/sdcard/Pictures/Screenshots"
 
 
 def _sh(cmd: str) -> tuple:
