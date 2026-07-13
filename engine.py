@@ -213,6 +213,19 @@ def execute_command(text: str) -> dict:
     """Main entry point for any incoming command."""
     result = {"success": False, "output": "", "skill_used": None}
 
+    # Check for multi-step or conditional commands
+    multi_step_keywords = [' then ', ' and then ', ' after that ', ' if ', 'first ', 'second ']
+    is_multi_step = any(kw in text.lower() for kw in multi_step_keywords)
+    
+    if is_multi_step:
+        try:
+            from skills.planner.engine import run as planner_run
+            plan_result = planner_run({"raw_text": text})
+            return plan_result
+        except Exception as e:
+            logger.error(f"PLANNER_ERROR: {e}")
+            # Fall through to normal execution if planner fails
+
     skill_name, args = classify_intent(text)
 
     if skill_name:
